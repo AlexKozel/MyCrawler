@@ -1,5 +1,6 @@
 package com.example.crawler.service;
 
+import com.example.crawler.model.PageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class Crawler {
 
     private final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
+    private static final Integer MAX_URL_NUMBER = 50;
     private PageScanner pageScanner;
 
     @Autowired
@@ -26,23 +28,51 @@ public class Crawler {
     public Crawler() {
     }
 
-    public String scan(String url, Integer depth, String words) {
+    public ArrayList<PageResult> scan(String url, Integer depth, String words) {
+        Integer foundedURL = 0;
+        Integer scanedUrl = 0;
         logger.info("start scan method");
-        Queue<String> urlsQueue = null;
-        ArrayList<String> html = new ArrayList<>();
-        Map<String, Map<String, Integer>> coincidences = new HashMap<>();
+
+        ArrayList<PageResult> pageResults = new ArrayList<>();
+
+        Queue<String> urlsQueue = new LinkedList<>();
+        ArrayList<String> html;
 
         urlsQueue.add(url);
         String curUrl;
 
-        while ((curUrl = urlsQueue.poll()) != null) {
-            logger.info("start scan url {}", url);
-            html = getHTML(curUrl);
-            urlsQueue = new LinkedList<>(pageScanner.scanForUrls(url));
-            coincidences.put(curUrl, pageScanner.scanCoincidences(html, words));
+        for (int localDepth = 0; localDepth < depth;localDepth++ ) {
+            Queue<String> curQueue = new LinkedList<>(urlsQueue);
+            urlsQueue.clear();
+            while ((curUrl = curQueue.poll()) != null && scanedUrl < MAX_URL_NUMBER) {
+                logger.info("start scan url {}", curUrl);
+                try {
+                    html = getHTML(curUrl);                                       //get all text from html
+                    if (html == null) {
+                        logger.info("invalid url {}", curUrl);
+                        continue;
+                    }
+                    scanedUrl++;
+                    pageResults.add(new PageResult(curUrl, pageScanner.scanCoincidences(html, words)));// scan html for coincidences
+                    /**
+                     * finished scan urls from queue
+                     */
 
+                    while (foundedURL < MAX_URL_NUMBER) { //может быть погрешность неправильных адресов (картинки и прочее)
+                        for (String s : pageScanner.scanForUrls(html)               //scan html for urls
+                        ) {
+                            if (foundedURL < MAX_URL_NUMBER) {
+                                curQueue.offer(s);
+                                foundedURL++;
+                            }
+                        }
+                    }
+                } catch (NullPointerException e) {
+                    logger.warn(e.toString());
+                }
+            }
         }
-        return html.toString();
+        return pageResults;
     }
 
 
@@ -52,7 +82,7 @@ public class Crawler {
      * @param url
      * @return
      */
-    private ArrayList getHTML(String url) {
+    public ArrayList getHTML(String url) {
 
         URL u;
         try {
@@ -72,7 +102,7 @@ public class Crawler {
             }
             return html;
         } catch (Exception e) {
-            logger.warn("exception - {}", e.toString());
+            logger.warn("get HTML  exception - {}", e.toString());
             return null;
         }
     }

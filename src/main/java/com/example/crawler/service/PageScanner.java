@@ -1,5 +1,7 @@
 package com.example.crawler.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -10,46 +12,48 @@ import java.util.stream.Collectors;
 @Service
 public class PageScanner {
 
-    private Scanner sc = new Scanner(System.in);
+    private Logger logger = LoggerFactory.getLogger(PageScanner.class);
 
-    public List<String> scanForUrls(String url) {
-        Scanner sc = new Scanner(System.in);
-//        String word = "musk";
-//        int count = 0;
-//        for (String singleString : html
-//        ) {
-//            Pattern p = Pattern.compile("\\b"+word +"\\b", Pattern.UNICODE_CASE| Pattern.CASE_INSENSITIVE);
-//            Matcher m = p.matcher(singleString);
-//            while(m.find()) count++;
-//
-//        }
-//        System.out.println(count);
-        List<String> urls = new ArrayList<>();
+    /**
+     * find all urls
+     */
+    public List<String> scanForUrls(ArrayList<String> html) {
+        logger.info("Scan for Urls");
+        Set<String> set = new HashSet<>();
+        for (String s : html
+        ) {
+            Pattern p = Pattern.compile("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+            Matcher m = p.matcher(s);
+            while (m.find()) {
+                set.add(m.group());
+            }
+        }
+        List<String> urls = new ArrayList<>(set);
         return urls;
     }
 
 
     /**
-     * fin all coincidences
+     * find all coincidences
      */
     public Map<String, Integer> scanCoincidences(ArrayList<String> html, String words) {
-        List<String> wordsList = Arrays.stream(words.split(",")).collect(Collectors.toList());
+        logger.info("Scan for coincidences");
+        List<String> wordsList = Arrays.stream(words.trim().split(",")).collect(Collectors.toList());
 
-        Map<String, Integer> newNap = new HashMap<>();
+        Map<String, Integer> newMap = new HashMap<>();
 
         for (String s : wordsList
         ) {
             int count = 0;
             for (String singleString : html
             ) {
-                Pattern p = Pattern.compile("\\b" + s.toLowerCase().trim() + "\\b", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
+                Pattern p = Pattern.compile("\\b" + s.trim() + "\\b", Pattern.UNICODE_CASE | Pattern.CASE_INSENSITIVE);
                 Matcher m = p.matcher(singleString);
                 while (m.find()) count++;
             }
-            newNap.put(s,count);
+            newMap.put(s.trim(), count);
         }
-        System.out.println("result = " + newNap);
-        return newNap;
+        return newMap;
     }
 
 }

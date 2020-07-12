@@ -4,15 +4,6 @@ target/
 !**/src/main/**
 !**/src/test/**
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -24,14 +15,5 @@ target/
 mvnw
 mvnw.cmd
 
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-
-### VS Code ###
-.vscode/
+*.csv
+*.csv*
