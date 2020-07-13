@@ -6,18 +6,12 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CSVGenerator {
 
-    public String convertToCSV(PageResult data) {
-        return Stream.of(data.toString())
-                .map(this::escapeSpecialCharacters)
-                .collect(Collectors.joining("\n"));
-    }
-
-    public String escapeSpecialCharacters(String data) {
+    public String escapeSpecialCharacters(PageResult pageResult) {
+        String data = pageResult.toString();
         String escapedData = data.replaceAll("\\R", " ");
         if (data.contains(",") || data.contains("\"") || data.contains("'")) {
             escapedData = data.replace("\"", "\"\"").replace("{", " ").replace("}", " ");
@@ -29,14 +23,13 @@ public class CSVGenerator {
         File csvOutputFile = new File(file);
         try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
             pageResults.stream()
-                    .map(this::convertToCSV)
+                    .map(this::escapeSpecialCharacters)
                     .forEach(pw::println);
         }
     }
 
 
     /**
-     *
      * get t10 pages with maximum total visit
      *
      * @param pageResults

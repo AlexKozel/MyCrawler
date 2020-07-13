@@ -22,7 +22,7 @@ public class PageScanner {
         Set<String> set = new HashSet<>();
         for (String s : html
         ) {
-            Pattern p = Pattern.compile("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+            Pattern p = Pattern.compile("\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:.;]*[-a-zA-Z0-9+&@#/%=~_|]");
             Matcher m = p.matcher(s);
             while (m.find()) {
                 set.add(m.group());

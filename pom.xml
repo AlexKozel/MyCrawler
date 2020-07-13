@@ -11,7 +11,7 @@
     <groupId>com.example</groupId>
     <artifactId>crowler</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>crowler</name>
+    <name>crawler</name>
     <description>Crawler with Spring</description>
 
     <properties>

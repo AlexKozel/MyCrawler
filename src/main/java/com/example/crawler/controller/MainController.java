@@ -15,10 +15,14 @@ import java.util.HashMap;
 @RestController
 public class MainController {
 
+    private Crawler crawler;
+    private CSVGenerator csvGenerator;
+
     @Autowired
-    Crawler crawler;
-    @Autowired
-    CSVGenerator csvGenerator;
+    public MainController(Crawler crawler, CSVGenerator csvGenerator ) {
+        this.crawler = crawler;
+        this.csvGenerator = csvGenerator;
+    }
 
     /**
      * JSON for PostRequest

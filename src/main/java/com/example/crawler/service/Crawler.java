@@ -17,7 +17,7 @@ public class Crawler {
 
     private final Logger logger = LoggerFactory.getLogger(Crawler.class);
 
-    private static final Integer MAX_URL_NUMBER = 50;
+    private static final Integer MAX_URL_NUMBER = 20;
     private PageScanner pageScanner;
 
     @Autowired
@@ -41,7 +41,7 @@ public class Crawler {
         urlsQueue.add(url);
         String curUrl;
 
-        for (int localDepth = 0; localDepth < depth;localDepth++ ) {
+        for (int localDepth = 0; localDepth < depth || !urlsQueue.isEmpty(); localDepth++ ) {
             Queue<String> curQueue = new LinkedList<>(urlsQueue);
             urlsQueue.clear();
             while ((curUrl = curQueue.poll()) != null && scanedUrl < MAX_URL_NUMBER) {
